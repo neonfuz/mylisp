@@ -10,13 +10,13 @@
 typedef enum {ET_SExpr, ET_Symbol} EntryType;
 
 typedef struct {
-    int start, end, depth;
     EntryType type;
+    int start, end, childeren;
 } Entry;
 
 void print_entry(Entry e, char *program)
 {
-    printf("%3d, %3d, %3d:   ", e.start, e.end, e.depth);
+    printf("%3d, %3d, %3d:   ", e.start, e.end, e.childeren);
     putchar(e.type==ET_SExpr?'(':'"');
     long i;
     for(i=e.start; i<e.end; ++i)
@@ -58,22 +58,22 @@ size_t count(char *program, size_t proglen)
  * Recursive parse function
  */
 size_t parse_rec(char *program, Entry *entries,
-                 size_t prog_i, size_t *ent_i, const int depth)
+                 size_t prog_i, size_t *ent_i)
 {
     /* Allocate space for this s-expression */
     Entry *my_entry = &entries[(*ent_i)++];
 
-    my_entry->start = prog_i;
-    my_entry->depth = depth;
     my_entry->type = ET_SExpr;
+    my_entry->start = prog_i;
+    my_entry->childeren = 0;
 
     Entry *symbol = NULL;
 
     while(1) {
         if(symbol == NULL && issymbolchr(program[prog_i])) {
+            ++my_entry->childeren;
             symbol = &entries[(*ent_i)++];
             symbol->start = prog_i;
-            symbol->depth = depth;
             symbol->type = ET_Symbol;
         }
         if(symbol != NULL && !issymbolchr(program[prog_i])) {
@@ -82,7 +82,8 @@ size_t parse_rec(char *program, Entry *entries,
         }
         switch(program[prog_i]) {
         case '(':
-            prog_i = parse_rec( program, entries, prog_i+1, ent_i, depth+1 );
+            ++my_entry->childeren;
+            prog_i = parse_rec( program, entries, prog_i+1, ent_i );
             break;
         default:
             ++prog_i;
@@ -100,7 +101,7 @@ size_t parse_rec(char *program, Entry *entries,
 void parse(char *program, Entry *entries)
 {
     size_t ent_i = 0;
-    parse_rec(program, entries, 1, &ent_i, 1);
+    parse_rec(program, entries, 1, &ent_i);
 }
 
 int main(int argc, char *argv[])
@@ -129,6 +130,7 @@ int main(int argc, char *argv[])
     parse(program, entries);
 
     /* Print entries */
+    printf("start end chldrn\n");
     size_t i;
     for(i=0; i<len; ++i) {
         print_entry(entries[i], program);
