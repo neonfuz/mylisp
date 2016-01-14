@@ -1,5 +1,9 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <assert.h>
 
 int main(int argc, char *argv[])
 {
@@ -8,26 +12,27 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    /* Open file */
-    FILE *f = fopen(argv[1], "r");
+    /* Open the file */
+    int fd = open(argv[1], O_RDONLY);
+    assert(fd != 0);
 
-    /* Get it's length */
-    fseek(f, 0, SEEK_END);
-    long len = ftell(f);
-    rewind(f);
+    /* Get info about the file, including size */
+    struct stat sb;
+    int err = fstat(fd, &sb);
+    assert(err == 0);
 
-    /* Allocate space for the program */
-    char *prog = malloc(len+1);
-    prog[len] = '\0';
-
-    /* Read the program into the buffer */
-    long i;
-    for(i=0; i<len; ++i) {
-        prog[i] = fgetc(f);
-    }
+    /* Map the file */
+    char *program = mmap(NULL, sb.st_size, PROT_READ, MAP_SHARED, fd, 0);
+    assert(program != MAP_FAILED);
 
     /* Print the program */
-    fputs(prog, stdout);
+    long i;
+    for(i=0; i<sb.st_size; ++i)
+        putchar(program[i]);
+
+    /* Clean up */
+    munmap(program, sb.st_size);
+    close(fd);
 
     return 0;
 }
