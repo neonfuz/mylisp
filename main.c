@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
     Entry *entries = malloc(sizeof(Entry) * len);
     parse(program, entries);
 
-    /* Print file */
+    /* Print entries */
     size_t i;
     for(i=0; i<len; ++i) {
         print_entry(entries[i], program);
