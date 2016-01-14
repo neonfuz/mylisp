@@ -41,10 +41,10 @@ size_t count(char *program, size_t proglen)
         if(c == '(')
             ++sexpr;
         if(in_symbol) {
-            if(issymbolchr(c))
+            if(!issymbolchr(c))
                 in_symbol = 0;
         } else {
-            if(!issymbolchr(c)) {
+            if(issymbolchr(c)) {
                 in_symbol = 1;
                 ++symbol;
             }
