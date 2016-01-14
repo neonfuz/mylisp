@@ -11,12 +11,12 @@ typedef enum {ET_SExpr, ET_Symbol} EntryType;
 
 typedef struct {
     EntryType type;
-    int start, end, childeren;
+    int start, end, children;
 } Entry;
 
 void print_entry(Entry e, char *program)
 {
-    printf("%3d, %3d, %3d:   ", e.start, e.end, e.childeren);
+    printf("%3d, %3d, %3d:   ", e.start, e.end, e.children);
     putchar(e.type==ET_SExpr?'(':'"');
     long i;
     for(i=e.start; i<e.end; ++i)
@@ -65,13 +65,13 @@ size_t parse_rec(char *program, Entry *entries,
 
     my_entry->type = ET_SExpr;
     my_entry->start = prog_i;
-    my_entry->childeren = 0;
+    my_entry->children = 0;
 
     Entry *symbol = NULL;
 
     while(1) {
         if(symbol == NULL && issymbolchr(program[prog_i])) {
-            ++my_entry->childeren;
+            ++my_entry->children;
             symbol = &entries[(*ent_i)++];
             symbol->start = prog_i;
             symbol->type = ET_Symbol;
@@ -82,7 +82,7 @@ size_t parse_rec(char *program, Entry *entries,
         }
         switch(program[prog_i]) {
         case '(':
-            ++my_entry->childeren;
+            ++my_entry->children;
             prog_i = parse_rec( program, entries, prog_i+1, ent_i );
             break;
         default:
