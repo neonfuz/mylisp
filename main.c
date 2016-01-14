@@ -10,9 +10,13 @@ typedef struct {
     int start, end, depth;
 } Entry;
 
-void print_entry(Entry e)
+void print_entry(Entry e, char *program)
 {
-    printf("%d, %d, %d\n", e.start, e.end, e.depth);
+    printf("%d, %d, %d ", e.start, e.end, e.depth);
+    long i;
+    for(i=e.start; i<e.end; ++i)
+        putchar(program[i]);
+    putchar('\n');
 }
 
 /* Gets length in entries of program 'program' of size 'proglen' bytes */
@@ -27,28 +31,38 @@ size_t get_len(char *program, size_t proglen)
 }
 
 /*
- * Parses program 'program' of size 'proglen' bytes, into 'entries', of
- * length 'len' entries. Is unsafe on misformatted programs.
+ * Recursive parse function
  */
-int parse(char *program, size_t proglen, Entry *entries, size_t len)
+size_t parse_rec(char *program, Entry *entries,
+                 size_t prog_i, size_t *ent_i, const int depth)
 {
-    int depth = 0;
-    size_t entry_i = 0;
+    Entry *my_entry = &entries[(*ent_i)++];
 
-    size_t i;
-    for(i=0; i<proglen; ++i) {
-        if(program[i] == '(') {
-            ++depth;
-            entries[entry_i].start = i;
-            entries[entry_i].depth = depth;
-            ++entry_i;
+    my_entry->start = prog_i;
+    my_entry->depth = depth;
+
+    while(1) {
+        switch(program[prog_i]) {
+        case '(':
+            prog_i = parse_rec( program, entries, prog_i+1, ent_i, depth+1 );
+            break;
+        default:
+            ++prog_i;
+            break;
+        case ')':
+            my_entry->end = prog_i;
+            return prog_i + 1;
         }
-        if(program[i] == ')')
-            entries[entry_i-depth].end = i;
-            --depth;
     }
+}
 
-    return entry_i;
+/*
+ * User friendly wrapper for recursive parse function
+ */
+void parse(char *program, Entry *entries)
+{
+    size_t ent_i = 0;
+    parse_rec(program, entries, 1, &ent_i, 1);
 }
 
 int main(int argc, char *argv[])
@@ -74,12 +88,12 @@ int main(int argc, char *argv[])
     /* Parse file */
     size_t len = get_len(program, sb.st_size);
     Entry *entries = malloc(sizeof(Entry) * len);
-    parse(program, sb.st_size, entries, len);
+    parse(program, entries);
 
     /* Print file */
     size_t i;
     for(i=0; i<len; ++i) {
-        print_entry(entries[i]);
+        print_entry(entries[i], program);
     }
 
     /* Clean up */
