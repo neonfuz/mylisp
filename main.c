@@ -7,17 +7,28 @@
 #include <sys/mman.h>
 #include <assert.h>
 
+typedef enum {ET_SExpr, ET_Symbol} EntryType;
+
 typedef struct {
     int start, end, depth;
+    EntryType type;
 } Entry;
 
 void print_entry(Entry e, char *program)
 {
-    printf("%d, %d, %d ", e.start, e.end, e.depth);
+    printf("%3d, %3d, %3d:   ", e.start, e.end, e.depth);
+    putchar(e.type==ET_SExpr?'(':'"');
     long i;
     for(i=e.start; i<e.end; ++i)
         putchar(program[i]);
+    putchar(e.type==ET_SExpr?')':'"');
     putchar('\n');
+}
+
+static inline
+int issymbolchr(char c)
+{
+    return !(c == '(' || c == ')' || isspace(c));
 }
 
 /* Gets length in entries of program 'program' of size 'proglen' bytes */
@@ -30,10 +41,10 @@ size_t count(char *program, size_t proglen)
         if(c == '(')
             ++sexpr;
         if(in_symbol) {
-            if(c == '(' || c == ')' || isspace(c))
+            if(issymbolchr(c))
                 in_symbol = 0;
         } else {
-            if(!(c == '(' || c == ')' || isspace(c))) {
+            if(!issymbolchr(c)) {
                 in_symbol = 1;
                 ++symbol;
             }
@@ -49,12 +60,26 @@ size_t count(char *program, size_t proglen)
 size_t parse_rec(char *program, Entry *entries,
                  size_t prog_i, size_t *ent_i, const int depth)
 {
+    /* Allocate space for this s-expression */
     Entry *my_entry = &entries[(*ent_i)++];
 
     my_entry->start = prog_i;
     my_entry->depth = depth;
+    my_entry->type = ET_SExpr;
+
+    Entry *symbol = NULL;
 
     while(1) {
+        if(symbol == NULL && issymbolchr(program[prog_i])) {
+            symbol = &entries[(*ent_i)++];
+            symbol->start = prog_i;
+            symbol->depth = depth;
+            symbol->type = ET_Symbol;
+        }
+        if(symbol != NULL && !issymbolchr(program[prog_i])) {
+            symbol->end = prog_i;
+            symbol = NULL;
+        }
         switch(program[prog_i]) {
         case '(':
             prog_i = parse_rec( program, entries, prog_i+1, ent_i, depth+1 );
