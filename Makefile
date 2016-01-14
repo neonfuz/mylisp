@@ -1,2 +1,3 @@
-all:
-	gcc -o main main.c
+bin/mylisp:
+	mkdir -p bin
+	gcc -o bin/mylisp main.c
