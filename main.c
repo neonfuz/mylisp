@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -20,14 +21,26 @@ void print_entry(Entry e, char *program)
 }
 
 /* Gets length in entries of program 'program' of size 'proglen' bytes */
-size_t get_len(char *program, size_t proglen)
+size_t count(char *program, size_t proglen)
 {
-    size_t i, len = 0;
+    size_t i, sexpr = 0, symbol = 0;
+    int in_symbol = 0;
     for(i=0; i<proglen; ++i) {
-        if(program[i] == '(')
-            ++len;
+        char c = program[i];
+        if(c == '(')
+            ++sexpr;
+        if(in_symbol) {
+            if(c == '(' || c == ')' || isspace(c))
+                in_symbol = 0;
+        } else {
+            if(!(c == '(' || c == ')' || isspace(c))) {
+                in_symbol = 1;
+                ++symbol;
+            }
+        }
     }
-    return len;
+
+    return sexpr + symbol;
 }
 
 /*
@@ -86,7 +99,7 @@ int main(int argc, char *argv[])
     assert(program != MAP_FAILED);
 
     /* Parse file */
-    size_t len = get_len(program, sb.st_size);
+    size_t len = count(program, sb.st_size);
     Entry *entries = malloc(sizeof(Entry) * len);
     parse(program, entries);
 
