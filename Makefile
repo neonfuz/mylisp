@@ -1,4 +1,4 @@
-bin/mylisp: *.c
+bin/mylisp: *.c *.h
 	mkdir -p bin
 	gcc -o bin/mylisp *.c
 
