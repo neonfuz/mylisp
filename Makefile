@@ -1,6 +1,6 @@
-bin/mylisp: main.c
+bin/mylisp: *.c
 	mkdir -p bin
-	gcc -o bin/mylisp main.c
+	gcc -o bin/mylisp *.c
 
 clean:
 	rm bin/*
