@@ -40,7 +40,7 @@ size_t tokenize_rec(char *program, Token *tokens,
     /* Allocate space for this s-expression */
     Token *my_token = &tokens[(*ent_i)++];
 
-    my_token->type = ET_SExpr;
+    my_token->type = TT_SExpr;
     my_token->start = prog_i;
     my_token->children = 0;
 
@@ -51,7 +51,7 @@ size_t tokenize_rec(char *program, Token *tokens,
             ++my_token->children;
             symbol = &tokens[(*ent_i)++];
             symbol->start = prog_i;
-            symbol->type = ET_Symbol;
+            symbol->type = TT_Symbol;
         }
         if(symbol != NULL && !issymbolchr(program[prog_i])) {
             symbol->end = prog_i;

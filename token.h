@@ -1,4 +1,4 @@
-typedef enum {ET_SExpr, ET_Symbol} TokenType;
+typedef enum {TT_SExpr, TT_Symbol} TokenType;
 
 typedef struct {
     TokenType type;

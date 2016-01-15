@@ -8,11 +8,11 @@
 void print_token(Token e, char *program)
 {
     printf("%3d, %3d, %3d:   ", e.start, e.end, e.children);
-    putchar(e.type==ET_SExpr?'(':'"');
+    putchar(e.type==TT_SExpr?'(':'"');
     long i;
     for(i=e.start; i<e.end; ++i)
         putchar(program[i]);
-    putchar(e.type==ET_SExpr?')':'"');
+    putchar(e.type==TT_SExpr?')':'"');
     putchar('\n');
 }
 
