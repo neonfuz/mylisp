@@ -4,6 +4,7 @@
 
 #include "mapfile.h"
 #include "token.h"
+#include "parse.h"
 
 void print_token(Token e, char *program)
 {
