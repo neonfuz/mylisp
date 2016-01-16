@@ -1,6 +1,6 @@
 bin/mylisp: *.c *.h
 	mkdir -p bin
-	gcc -o bin/mylisp *.c
+	$(CC) $(CFLAGS) -o bin/mylisp *.c
 
 clean:
 	rm bin/*
