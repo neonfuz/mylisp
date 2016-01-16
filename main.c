@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
     puts("");
 
     /* Parse tokens */
-    Node n = parse_sexpr(tokens, mf.file);
+    Node n = parse(tokens, mf.file);
 
     /* Print nodes */
     puts("Parsed tokens:");
