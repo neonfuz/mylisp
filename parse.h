@@ -35,4 +35,6 @@ typedef union node_u {
     BoolNode   bol;
 } Node;
 
-Node parse_symbol(Token t, char *program);
+Node parse_symbol(Token *t, char *program);
+Node parse_sexpr(Token *t, char *program);
+Node parse(Token *t, char *program);
