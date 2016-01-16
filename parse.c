@@ -5,20 +5,41 @@
 #include "token.h"
 #include "parse.h"
 
+static inline
+int isnumchr(char c) {
+    return isdigit(c) || c == '+' || c == '-';
+}
+
+static inline
+int boolchr_to_int(char c) {
+    switch(tolower(c)) {
+    case 't': return 1;
+    default: return 0;
+    }
+}
+
 Node parse_symbol(Token *tp, char *program)
 {
     Node n;
     Token t = *tp;
 
-    if ( isdigit( program[t.start] ) ) {
+    if ( isnumchr( program[t.start] ) ) {
         n.type = NT_number;
         n.num.value = atoi( &program[t.start] ); /* potentially unsafe? */
-    } else if ( program[t.start] == '"' ) {
-        n.type = NT_string;
-        n.str.value = strndup( &program[t.start+1], t.end-t.start-2 );
     } else {
-        n.type = NT_symbol;
-        n.sym.name = strndup( &program[t.start], t.end-t.start );
+        switch(program[t.start]) {
+        case '"':
+            n.type = NT_string;
+            n.str.value = strndup( &program[t.start+1], t.end-t.start-2 );
+            break;
+        case '#':
+            n.type = NT_bool;
+            n.bol.value = boolchr_to_int( program[t.start+1] );
+            break;
+        default:
+            n.type = NT_symbol;
+            n.sym.name = strndup( &program[t.start], t.end-t.start );
+        }
     }
 
     return n;
