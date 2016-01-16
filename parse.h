@@ -1,4 +1,4 @@
-typedef enum {NT_link, NT_number, NT_string, NT_symbol, NT_bool} NodeType;
+typedef enum {NT_link, NT_symbol, NT_string, NT_number, NT_bool} NodeType;
 
 typedef struct list_node_s {
     NodeType type;
@@ -8,8 +8,8 @@ typedef struct list_node_s {
 
 typedef struct {
     NodeType type;
-    int value;
-} NumberNode;
+    char *name;
+} SymbolNode;
 
 typedef struct {
     NodeType type;
@@ -18,20 +18,21 @@ typedef struct {
 
 typedef struct {
     NodeType type;
-    char *name;
-} SymbolNode;
+    int value;
+} NumberNode;
 
 typedef struct {
     NodeType type;
-    int val; /* Is zero or non zero */
+    int value; /* Is zero or non zero */
 } BoolNode;
 
 typedef union node_u {
     NodeType type;
     LinkNode   lin;
-    NumberNode num;
-    StringNode str;
     SymbolNode sym;
+    StringNode str;
+    NumberNode num;
+    BoolNode   bol;
 } Node;
 
 Node parse_symbol(Token t, char *program);
