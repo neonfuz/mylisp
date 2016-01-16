@@ -32,8 +32,8 @@ Node parse_sexpr(Token *t, char *program)
     LinkNode *links = calloc(n, sizeof(LinkNode));
     Node *nodes = calloc(n, sizeof(Node));
 
-    int i;
-    for(i=0; i<n; ++i) {
+    int i, j;
+    for(i=0, j=0; i<n; ++i, ++j) {
         links[i].type = NT_link;
         links[i].node = &nodes[i];
         if ( i+1 >= n )
@@ -41,7 +41,9 @@ Node parse_sexpr(Token *t, char *program)
         else
             links[i].next = &links[i+1];
 
-        nodes[i] = parse( &t[i], program );
+        nodes[i] = parse( &t[j], program );
+        if(t[j].type == TT_SExpr)
+            j += t[j].children;
     }
 
     return (Node)links[0];
