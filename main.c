@@ -78,13 +78,13 @@ void print_node_to_sexpr(Node n)
         fputs(n.sym.name, stdout);
         break;
     case NT_string:
-        fputs(n.str.value, stdout);
+        printf("\"%s\"", n.str.value);
         break;
     case NT_number:
         printf("%d", n.num.value);
         break;
     case NT_bool:
-        putchar(n.bol.value?'1':'0');
+        printf("#%c", n.bol.value?'t':'f');
         break;
     }
 }
