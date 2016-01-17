@@ -3,8 +3,10 @@ Mylisp
 
 ## Description
 This project is planned to be a lisp interpreter, but right now its
-just a basic s-expression parser.
+just a basic s-expression parser. The project is, and will be written
+in c.
 
 ## Usage
-Usage is very simple. Make with 'make', and run with './bin/mylisp
-<program>'. testprog.lisp is provided as an example lisp program.
+To compile, simply run make. To run the program against a test lisp file:
+
+    ./bin/mylisp testproj.lisp
